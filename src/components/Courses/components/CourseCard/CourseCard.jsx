@@ -1,7 +1,3 @@
-import React from "react";
-import { getCourseDuration, formatCreationDate } from "../../../../helpers";
-import styles from "./styles.module.css";
-import { Button } from "../../../../common";
 // Module 1.
 // * figma link: https://www.figma.com/design/m0N0SGLclqUEGR6TUNvyn9/Fundamentals-Courses?node-id=2905-67147&t=OXbHXwMixWTtxRSw-1
 // * render this component inside 'Courses' component
@@ -17,29 +13,13 @@ import { Button } from "../../../../common";
 
 // Module 2.
 // * remove prop 'handleShowCourse' => use 'Link' from 'react-router-dom' instead
+import React from "react";
+import { Link } from "react-router-dom";
+import { getCourseDuration, formatCreationDate } from "../../../../helpers";
+import styles from "./styles.module.css";
+import { Button } from "../../../../common";
 
-// Module 3.
-// * add two new buttons: update and delete'. Use icons from 'src/assets/...'.
-// * remove course from the store by 'delete' button click
-// * no functionality for 'update' button for now
-// ** TASK DESCRIPTION ** - https://react-fundamentals-tasks.vercel.app/docs/module-3/home-task/components#coursecard-component
-// * remove prop 'authorsList' => use 'getAuthorsSelector' to get authors from store
-
-// Module 4.
-// * show 'delete' and 'update' buttons only for ADMIN user
-// * make delete request by 'delete' button click
-// * use 'deleteCourseService' from 'src/services.js' and 'deleteCourseThunk' thunk from 'src/store/thinks/coursesThunk.js'
-// ** TASK DESCRIPTION ** - https://react-fundamentals-tasks.vercel.app/docs/module-4/home-task/components#coursecard-component
-
-// Module 5:
-// * proposed cases for unit tests:
-//   ** CourseCard should display title.
-//   ** CourseCard should display description.
-//   ** CourseCard should display duration in the correct format.
-//   ** CourseCard should display authors list.
-//   ** CourseCard should display created date in the correct format.
-
-export const CourseCard = ({ course, handleShowCourse, authorsList }) => {
+export const CourseCard = ({ course, authorsList }) => {
   return (
     <div className={styles.cardContainer} data-testid="courseCard">
       <div className={styles.cardText}>
@@ -64,13 +44,32 @@ export const CourseCard = ({ course, handleShowCourse, authorsList }) => {
           <span>{formatCreationDate(course.creationDate)}</span>
         </p>
         <div className={styles.buttonsContainer}>
-          <Button
-            buttonText="SHOW COURSE"
-            handleClick={() => handleShowCourse(course.id)}
-          />
-          {/* Здесь потом добавишь кнопки Delete/Update */}
+          <Link to={`/courses/${course.id}`} className={styles.noUnderline}>
+            <Button buttonText="SHOW COURSE" />
+          </Link>
         </div>
       </div>
     </div>
   );
 };
+
+// Module 3.
+// * add two new buttons: update and delete'. Use icons from 'src/assets/...'.
+// * remove course from the store by 'delete' button click
+// * no functionality for 'update' button for now
+// ** TASK DESCRIPTION ** - https://react-fundamentals-tasks.vercel.app/docs/module-3/home-task/components#coursecard-component
+// * remove prop 'authorsList' => use 'getAuthorsSelector' to get authors from store
+
+// Module 4.
+// * show 'delete' and 'update' buttons only for ADMIN user
+// * make delete request by 'delete' button click
+// * use 'deleteCourseService' from 'src/services.js' and 'deleteCourseThunk' thunk from 'src/store/thinks/coursesThunk.js'
+// ** TASK DESCRIPTION ** - https://react-fundamentals-tasks.vercel.app/docs/module-4/home-task/components#coursecard-component
+
+// Module 5:
+// * proposed cases for unit tests:
+//   ** CourseCard should display title.
+//   ** CourseCard should display description.
+//   ** CourseCard should display duration in the correct format.
+//   ** CourseCard should display authors list.
+//   ** CourseCard should display created date in the correct format.

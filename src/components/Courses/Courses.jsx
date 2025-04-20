@@ -1,9 +1,3 @@
-import React from "react";
-
-import styles from "./styles.module.css";
-import { Button } from "../../common";
-import { CourseCard } from "./components";
-
 // Module 1:
 // * render list of components using 'CourseCard' component for each course
 // * render 'ADD NEW COURSE' button (reuse Button component)
@@ -17,6 +11,54 @@ import { CourseCard } from "./components";
 // * navigate to this component if 'localStorage' contains user's token
 // * navigate to the route courses/add by clicking 'Add New Course' button, use 'Link' component from 'react-router-dom'
 // ** TASK DESCRIPTION ** - https://react-fundamentals-tasks.vercel.app/docs/module-2/home-task/components#courses
+import React, { useEffect } from "react";
+import styles from "./styles.module.css";
+import { Button } from "../../common";
+import { CourseCard } from "./components";
+import { Link, useNavigate } from "react-router-dom";
+
+export const Courses = ({ coursesList, authorsList }) => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+    }
+  }, [navigate]);
+
+  if (coursesList.length === 0) {
+    return <EmptyCourseList />;
+  }
+
+  return (
+    <>
+      <div className={styles.panel}>
+        <Link to="/courses/add" className={styles.noUnderline}>
+          <Button buttonText="ADD NEW COURSE" data-testid="addCourse" />
+        </Link>
+      </div>
+
+      {coursesList.map((course) => (
+        <CourseCard key={course.id} course={course} authorsList={authorsList} />
+      ))}
+    </>
+  );
+};
+
+const EmptyCourseList = () => {
+  return (
+    <div className={styles.empty} data-testid="emptyContainer">
+      <h2>Your List Is Empty</h2>
+      <p>Please use "add new course" button to add your first course</p>
+      <div className={styles.buttonContainer}>
+        <Link to="/courses/add" className={styles.noUnderline}>
+          <Button buttonText="ADD NEW COURSE" data-testid="addCourse" />
+        </Link>
+      </div>
+    </div>
+  );
+};
 
 // Module 3:
 // * stop using mocked courses and authors data
@@ -33,42 +75,3 @@ import { CourseCard } from "./components";
 // * proposed cases for unit tests:
 //   ** Courses should display amount of CourseCard equal length of courses array.
 //   ** CourseForm should be shown after a click on the "Add new course" button.
-
-export const Courses = ({
-  coursesList,
-  authorsList,
-  onAddClick,
-  handleShowCourse,
-}) => {
-  if (coursesList.length === 0) {
-    return <EmptyCourseList />;
-  } else {
-    return (
-      <>
-        <div key="add-new-course" className={styles.panel}>
-          <Button buttonText="ADD NEW COURSE" data-testid="addCourse" />
-        </div>
-        {Object.entries(coursesList).map(([_, course]) => (
-          <CourseCard
-            key={course.id}
-            course={course}
-            authorsList={authorsList}
-            handleShowCourse={handleShowCourse}
-          />
-        ))}
-      </>
-    );
-  }
-};
-
-export const EmptyCourseList = () => {
-  return (
-    <div className={styles.empty} data-testid="emptyContainer">
-      <h2>Your List Is Empty</h2>
-      <p>Please use "add new course" button to add your first course</p>
-      <div className={styles.buttonContainer}>
-        <Button buttonText="ADD NEW COURSE" data-testid="addCourse" />
-      </div>
-    </div>
-  );
-};
