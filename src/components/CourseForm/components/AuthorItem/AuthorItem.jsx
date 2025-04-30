@@ -2,7 +2,7 @@ import React from "react";
 import styles from "./styles.module.css";
 import { Button } from "../../../../common";
 import deleteIcon from "../../../../assets/deleteButtonIcon.svg";
-<img src={deleteIcon} alt="delete" style={{ width: 20, height: 20 }} />;
+
 export const AuthorItem = ({
   name,
   onClick,

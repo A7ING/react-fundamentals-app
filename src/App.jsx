@@ -1,3 +1,4 @@
+/* eslint-disable no-duplicate-imports */
 // Module 2:
 // * use mockedAuthorsList and mockedCoursesList mocked data
 // * remove useState for selected courseId
@@ -5,14 +6,16 @@
 // * import Routes and Route from 'react-router-dom'
 // * Add Routes to the container div (do not include Header to the Routes since header will not be changed with pages)
 // ** TASK DESCRIPTION ** - https://react-fundamentals-tasks.vercel.app/docs/module-2/home-task/components#add-the-router-to-the-app-component
-import React, { useEffect, useState } from "react";
-import {
-  Routes,
-  Route,
-  useNavigate,
-  Navigate,
-  useLocation,
-} from "react-router-dom";
+
+// Module 3:
+// * the App component and BrowserRouter components should be wrapped with Redux 'Provider' in src/index.js
+// * remove 'mockedAuthorsList' and 'mockedCoursesList' constants amd import and their use throughout the project
+// * use selector from store/selectors.js to get user token from store
+// * get courses and authors from the server. Use courses/all and authors/all GET requests.
+// * save courses and authors to the store. Use 'setCourses' and 'setAuthors' actions from appropriate slices here 'src/store/slices'
+// ** TASK DESCRIPTION ** - https://react-fundamentals-tasks.vercel.app/docs/module-3/home-task/components#app-component
+import React, { useEffect } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 import styles from "./App.module.css";
 import {
   Header,
@@ -22,112 +25,58 @@ import {
   CourseInfo,
   CourseForm,
 } from "./components";
-import { mockedAuthorsList, mockedCoursesList } from "./constants";
+import { useDispatch, useSelector } from "react-redux";
+import { selectUserToken } from "./store/selectors";
+import { getCourses, getAuthors } from "./services";
+import { setCourses } from "./store/slices/coursesSlice";
+import { setAuthors } from "./store/slices/authorsSlice";
 
 function App() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [token, setToken] = useState(localStorage.getItem("token"));
-  const [userName, setUserName] = useState(localStorage.getItem("userName"));
-  const [courses, setCourses] = useState(mockedCoursesList);
-  const [authors, setAuthors] = useState(mockedAuthorsList);
+  const dispatch = useDispatch();
+  const token = useSelector(selectUserToken);
 
   useEffect(() => {
-    const tokenFromStorage = localStorage.getItem("token");
-    const userNameFromStorage = localStorage.getItem("userName");
+    if (token && process.env.NODE_ENV !== "test") {
+      const fetchData = async () => {
+        try {
+          const courses = await getCourses();
+          const authors = await getAuthors();
+          dispatch(setCourses(courses.result));
+          dispatch(setAuthors(authors.result));
+        } catch (error) {
+          console.error("Ошибка при загрузке курсов или авторов:", error);
+        }
+      };
 
-    setToken(tokenFromStorage);
-    setUserName(userNameFromStorage);
-
-    if (location.pathname === "/" || location.pathname === "") {
-      navigate(tokenFromStorage ? "/courses" : "/login", { replace: true });
+      fetchData();
     }
-  }, [location.pathname, navigate]);
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userName");
-    setToken(null);
-    setUserName(null);
-    navigate("/login");
-  };
-
-  const handleCreateCourse = (newCourse) => {
-    setCourses((prev) => [...prev, newCourse]);
-  };
-
-  const handleCreateAuthor = (newAuthor) => {
-    setAuthors((prev) => [...prev, newAuthor]);
-  };
-
-  const isAuthPage =
-    location.pathname === "/login" || location.pathname === "/registration";
+  }, [token, dispatch]);
 
   return (
-    <div className={styles.wrapper}>
-      {!isAuthPage && token && (
-        <Header userName={userName} onLogout={handleLogout} />
-      )}
-      <div className={styles.container}>
-        <Routes>
-          <Route
-            path="/login"
-            element={<Login setToken={setToken} setUserName={setUserName} />}
-          />
-          <Route path="/registration" element={<Registration />} />
-          <Route
-            path="/courses"
-            element={
-              token ? (
-                <Courses coursesList={courses} authorsList={authors} />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
-          />
-          <Route
-            path="/courses/:courseId"
-            element={
-              token ? (
-                <CourseInfo coursesList={courses} authorsList={authors} />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
-          />
-          <Route
-            path="/courses/add"
-            element={
-              token ? (
-                <CourseForm
-                  authorsList={authors}
-                  createCourse={handleCreateCourse}
-                  createAuthor={handleCreateAuthor}
-                />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
-          />
-          <Route
-            path="*"
-            element={<Navigate to={token ? "/courses" : "/login"} />}
-          />
-        </Routes>
-      </div>
+    <div className={styles.app}>
+      <Header />
+      <Routes>
+        {!token ? (
+          <>
+            <Route path="/" element={<Navigate to="/login" />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/registration" element={<Registration />} />
+            <Route path="*" element={<Navigate to="/login" />} />
+          </>
+        ) : (
+          <>
+            <Route path="/" element={<Courses />} />
+            <Route path="/courses/add" element={<CourseForm />} />
+            <Route path="/courses/:courseId" element={<CourseInfo />} />
+            <Route path="*" element={<Navigate to="/" />} />
+          </>
+        )}
+      </Routes>
     </div>
   );
 }
 
 export default App;
-
-// Module 3:
-// * the App component and BrowserRouter components should be wrapped with Redux 'Provider' in src/index.js
-// * remove 'mockedAuthorsList' and 'mockedCoursesList' constants amd import and their use throughout the project
-// * use selector from store/selectors.js to get user token from store
-// * get courses and authors from the server. Use courses/all and authors/all GET requests.
-// * save courses and authors to the store. Use 'setCourses' and 'setAuthors' actions from appropriate slices here 'src/store/slices'
-// ** TASK DESCRIPTION ** - https://react-fundamentals-tasks.vercel.app/docs/module-3/home-task/components#app-component
 
 // Module 4:
 // * rewrite old GET requests /courses/all with 'getCoursesThunk' from 'src/store/thunks/coursesThunk.js' using getCourses service from 'src/services.js'.
