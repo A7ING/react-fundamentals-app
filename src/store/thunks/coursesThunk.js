@@ -1,8 +1,8 @@
 import {
   getCourses,
   createCourse,
-  deleteCourse as apiDeleteCourse,
-  updateCourse as apiUpdateCourse,
+  deleteCourse as removeCourseFromApi,
+  updateCourse as updateCourseInApi,
 } from "../../services";
 
 import {
@@ -12,38 +12,41 @@ import {
   updateCourse,
 } from "../slices/coursesSlice";
 
-export const getCoursesThunk = () => async (dispatch) => {
+export const fetchCourses = () => async (dispatch) => {
   try {
-    const courses = await getCourses();
-    dispatch(setCourses(courses));
-  } catch (error) {
-    console.error("Failed to fetch courses:", error);
+    const response = await getCourses();
+    dispatch(setCourses(response));
+  } catch (err) {
+    console.error("Unable to load courses:", err);
   }
 };
 
-export const createCourseThunk = (newCourse) => async (dispatch) => {
+export const submitNewCourse = (courseData) => async (dispatch) => {
   try {
-    const createdCourse = await createCourse(newCourse);
-    dispatch(saveCourse(createdCourse));
-  } catch (error) {
-    console.error("Failed to create course:", error);
+    const token = localStorage.getItem("token");
+    const created = await createCourse(courseData, token);
+    dispatch(saveCourse(created));
+  } catch (err) {
+    console.error("Unable to create course:", err);
   }
 };
 
-export const deleteCourseThunk = (courseId) => async (dispatch) => {
+export const removeCourse = (courseId) => async (dispatch) => {
   try {
-    await apiDeleteCourse(courseId);
+    const token = localStorage.getItem("token");
+    await removeCourseFromApi(courseId, token);
     dispatch(deleteCourse(courseId));
-  } catch (error) {
-    console.error("Failed to delete course:", error);
+  } catch (err) {
+    console.error("Unable to delete course:", err);
   }
 };
 
-export const updateCourseThunk = (updatedCourse) => async (dispatch) => {
+export const modifyCourse = (courseData) => async (dispatch) => {
   try {
-    const result = await apiUpdateCourse(updatedCourse);
-    dispatch(updateCourse(result));
-  } catch (error) {
-    console.error("Failed to update course:", error);
+    const token = localStorage.getItem("token");
+    const updated = await updateCourseInApi(courseData, token);
+    dispatch(updateCourse(updated));
+  } catch (err) {
+    console.error("Unable to update course:", err);
   }
 };

@@ -93,58 +93,73 @@ export const login = async (data) => {
 
 export const createCourse = async (course) => {
   const token = localStorage.getItem("token");
-  const response = await fetch(`${BASE_URL}/courses/add`, {
-    method: "POST",
-    body: JSON.stringify(course),
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
 
-  const result = await response.json();
+  try {
+    const response = await fetch(`${BASE_URL}/courses/add`, {
+      method: "POST",
+      body: JSON.stringify(course),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-  if (!response.ok) {
-    const message = result?.result || "Не удалось создать курс";
-    throw new Error(message);
+    const result = await response.json();
+
+    if (!response.ok) {
+      const message = result?.result || "Не удалось создать курс";
+      throw new Error(message);
+    }
+
+    return result;
+  } catch (error) {
+    throw error;
   }
-
-  return result;
 };
 
 export const deleteCourse = async (courseId) => {
   const token = localStorage.getItem("token");
-  const response = await fetch(`${BASE_URL}/courses/${courseId}`, {
-    method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
 
-  if (!response.ok) {
-    const result = await response.json();
-    const message = result?.result || "Не удалось удалить курс";
-    throw new Error(message);
+  try {
+    const response = await fetch(`${BASE_URL}/courses/${courseId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const result = await response.json();
+      const message = result?.result || "Не удалось удалить курс";
+      throw new Error(message);
+    }
+  } catch (error) {
+    throw error;
   }
 };
 
 export const updateCourse = async (course) => {
   const token = localStorage.getItem("token");
-  const response = await fetch(`${BASE_URL}/courses/${course.id}`, {
-    method: "PUT",
-    body: JSON.stringify(course),
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
 
-  const result = await response.json();
+  try {
+    const response = await fetch(`${BASE_URL}/courses/${course.id}`, {
+      method: "PUT",
+      body: JSON.stringify(course),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-  if (!response.ok) {
-    const message = result?.result || "Не удалось обновить курс";
-    throw new Error(message);
+    const result = await response.json();
+
+    if (!response.ok) {
+      const message = result?.result || "Не удалось обновить курс";
+      throw new Error(message);
+    }
+
+    return result;
+  } catch (error) {
+    throw error;
   }
-
-  return result;
 };

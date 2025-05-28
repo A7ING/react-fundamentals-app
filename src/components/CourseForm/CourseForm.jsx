@@ -123,7 +123,7 @@ export const CourseForm = () => {
               data-testid="durationInput"
             />
             <div className={styles.durationOutput}>
-              {getCourseDuration(Number(duration))} hours
+              {getCourseDuration(Number(duration))}
             </div>
 
             <h3>Authors</h3>

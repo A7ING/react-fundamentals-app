@@ -13,6 +13,7 @@ import styles from "./styles.module.css";
 import { Input, Button } from "../../../../common";
 import { useDispatch } from "react-redux";
 import { saveAuthor } from "../../../../store/slices/authorsSlice";
+import { v4 as uuidv4 } from "uuid";
 
 export const CreateAuthor = () => {
   const [authorName, setAuthorName] = useState("");
@@ -25,6 +26,7 @@ export const CreateAuthor = () => {
     }
 
     const newAuthor = {
+      id: uuidv4(),
       name: authorName,
     };
 
